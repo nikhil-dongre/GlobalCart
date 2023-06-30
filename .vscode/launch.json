@@ -12,6 +12,17 @@
       "args": ["runserver"],
       "django": true,
       "justMyCode": true
+    },
+    {
+      "name": "GlobalCart",
+      "python": "C:\\Users\\user\\GlobalCart\\venv\\Scripts\\python.exe",
+      "type": "python",
+      "request": "launch",
+      "program": "C:\\Users\\user\\GlobalCart\\manage.py",
+      "console": "internalConsole",
+      "args": ["runserver"],
+      "django": true,
+      "justMyCode": true
     }
   ]
 }
