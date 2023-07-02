@@ -22,6 +22,13 @@ class Product(models.Model):
     def get_url(self):
         return reverse('product_detail', args=[self.category.slug, self.slug])
     
+class VariationManager(models.Manager):
+    def colors(self):
+        return super(VariationManager, self).filter(vatiation_category = 'color',is_active = True)
+    def size(self):
+        return super(VariationManager, self).filter(vatiation_category = 'size',is_active = True)
+    
+    
 variation_categories_choice = (
     ('color', 'color'),
     ('size', 'size')
@@ -34,8 +41,12 @@ class Variation(models.Model):
     is_active = models.BooleanField(default=True)
     create_date = models.DateTimeField(auto_now_add=True)
 
-    def __unicode__(self):
-        return self.product
+    objects = VariationManager()
+
+
+    def __str__(self):
+        return self.variation_value
+
     
 
 
