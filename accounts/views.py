@@ -6,6 +6,8 @@ from django.contrib import messages,auth
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
+from carts.models import Cart,CartItem
+from carts.views import _card_id
 # Verifications
 
 from django.contrib.sites.shortcuts import get_current_site
@@ -64,6 +66,57 @@ def login(request):
 
         
         if user is not None:
+            try:
+                print("Inside try block")
+                cart = Cart.objects.get(cart_id = _card_id(request))
+                is_cart_item_exits = CartItem.objects.filter(cart=cart).exists()
+                if is_cart_item_exits :
+                    cart_item = CartItem.objects.filter(cart=cart)
+                    # getting product variation by cart_id
+                    variation_product = []
+                    for item in cart_item:
+                        variations = item.variations.all()
+                        variation_product.append(list(variations))
+                    
+                    # get the cart item from the user to acces product varioations 
+                    cart_item = CartItem.objects.filter(user = user)
+                    # existing variation --> database
+                    # cart or item 
+                    existing_variation_list = []
+                    id = []
+                    # if cart_item:
+                    for items in cart_item:
+                        existing_variation = items.variations.all()
+                        existing_variation_list.append(list(existing_variation))
+                        id.append(items.id)
+                    print(existing_variation_list)
+
+                    for pr in variation_product:
+                        if pr in existing_variation_list:
+                            index = existing_variation_list.index(pr)
+                            item_id = id[index]
+                            item = CartItem.objects.get(id=item_id)
+                            item.quantity +=1
+                            item.user = user
+                            item.save()
+                        else:
+                            cart_item = CartItem.objects.filter(user=user)
+                            for item in cart_item:
+                                item.user = user
+                                item.save()
+                    # else:
+                    #     cart_item = CartItem.objects.create(quantity=1,user = user)
+
+                    #     if len(variation_product)> 0 :
+                    #         cart_item.variations.clear()
+                    #         cart_item.variations.add(*variation_product)
+
+                    #     cart_item.save()
+
+        # existing variation --> database
+
+            except:
+                pass
             auth.login(request,user)
             messages.success(request,"You are now logged in ")
             # messages.success(request, 'Login successful')
@@ -93,7 +146,7 @@ def activate(request,uidb64,token):
         messages.success( request,"Congratulation YOur account is activated ")
         return redirect('login')
     else:
-        messages.error("INvalid activation link")
+        messages.error(request,"INvalid activation link")
         return redirect('register')
     
 @login_required(login_url=login)
