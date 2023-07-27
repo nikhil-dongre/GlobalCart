@@ -128,10 +128,10 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
-STATIC_ROOT = BASE_DIR /'static'
+STATIC_ROOT = BASE_DIR /'static/'
 
 STATICFILES_DIRS = [
-    'globalcart/static',
+    'globalcart/static/',
 ]
 
 MEDIA_URL = '/media/'
