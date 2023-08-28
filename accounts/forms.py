@@ -1,6 +1,6 @@
 from typing import Any, Dict
 from django import forms
-from .models import Account
+from .models import Account,UserProfile
 
 class RegistrationForm(forms.ModelForm):
     password = forms.CharField(widget=forms.PasswordInput(attrs={
@@ -32,6 +32,33 @@ class RegistrationForm(forms.ModelForm):
         confirm_passoword = cleaned_data.get('confirm_password')
         if confirm_passoword != password:
             raise forms.ValidationError('Passowrd doest not match')
+        
+class UserForm(forms.ModelForm):
+    class Meta:
+        model = Account
+        fields = ['first_name', 'last_name', 'phone_no', 'password','email']
+    
+    def __init__(self,*args,**kwargs):
+        super(UserForm,self).__init__(*args,**kwargs)
+        
+        for field in self.fields:
+            self.fields[field].widget.attrs['class'] = 'form-control'
+
+
+
+class UserProfileForm(forms.ModelForm):
+    profile_picture = forms.ImageField(required=False, error_messages= {'invalid': ("Image Files only")}, widget=forms.FileInput)
+    class Meta:
+        model = UserProfile
+        fields = ['address_line1', 'address_line2', 'profile_picture', 'city','country']
+
+    def __init__(self,*args,**kwargs):
+        super(UserProfileForm,self).__init__(*args,**kwargs)
+
+        for field in self.fields:
+            self.fields[field].widget.attrs['class'] = 'form-control'
+
+
             
         
 
