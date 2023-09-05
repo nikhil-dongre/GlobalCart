@@ -7,7 +7,7 @@ from django.contrib.auth import authenticate, login
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
 from carts.models import Cart,CartItem
-from orders.models import Order
+from orders.models import Order,OrderProduct
 from carts.views import _card_id
 # Verifications
 
@@ -32,6 +32,13 @@ def register(request):
             username = form.cleaned_data['email'].split('@')[0]
             user = Account.objects.create_user(first_name=first_name, last_name=last_name,email=email,password=password,username=username)
             user.phone_no = phone_no
+            user.save()
+
+            # Crete a userprofile
+            user_profile = UserProfile()
+            user_profile.user_id = user.id
+            user_profile.profile_picture = 'default/default-user.png'
+            user_profile.save()
 
             # activation User
             current_site = get_current_site(request)
@@ -150,8 +157,10 @@ def activate(request,uidb64,token):
 def dashboard(request):
     orders = Order.objects.order_by('-created_at').filter(user_id=request.user.id, is_ordered=True)
     order_count = orders.count()
+    userprofile = UserProfile.objects.get(user_id = request.user.id)
     context = {
         'order_count': order_count,
+        'userprofile': userprofile,
     }
     return render(request, 'accounts/dashboard.html',context)
 
@@ -216,7 +225,7 @@ def resetPassword(request):
     else:
         return render(request, 'accounts/resetPassword.html')
     
-
+@login_required(login_url='login')
 def my_orders(request):
     orders = Order.objects.order_by('-created_at').filter(user_id=request.user.id, is_ordered=True)
     context = {
@@ -225,17 +234,20 @@ def my_orders(request):
 
     return render(request, 'accounts/my_orders.html',context)
 
+@login_required(login_url='login')
 def edit_profile(request):
     userprofile = get_object_or_404(UserProfile, user = request.user)
     if request.method == 'POST':
         user_form = UserForm(request.POST, instance= request.user)
         profile_form = UserProfileForm(request.POST, request.FILES, instance= userprofile)
 
-        if user_form.is_valid() and profile_form.is_valid():
-            user_form.save()
-            profile_form.save()
-            messages.success("Your has been updated")
-            return redirect('edit_profile')
+        if user_form.is_valid() :
+
+            if profile_form.is_valid():
+                user_form.save()
+                profile_form.save()
+                messages.success(request,"Your Profile has been updated")
+                return redirect('edit_profile')
     else:
         user_form = UserForm(instance=request.user)
         profile_form = UserProfileForm(instance=userprofile)
@@ -247,6 +259,50 @@ def edit_profile(request):
 
     }
     return render(request, 'accounts/edit_profile.html',context)
+
+@login_required(login_url='login')
+def change_password(request):
+    print("into change Password")
+    if request.method == 'POST':
+        current_password = request.POST['current_password']
+        new_password = request.POST['new_password']
+        confirm_password = request.POST['confirm_new_password']
+
+        user = Account.objects.get(id =  request.user.id)
+        
+        if new_password == confirm_password:
+            success = user.check_password(current_password)
+            if success:
+                user.set_password(new_password)
+                user.save()
+                # auth.Logut(request)
+                messages.success(request,"Password Update successfully")
+                return redirect('change_password')
+            else:
+                messages.error(request,"Please enter correct password")
+                return redirect("change_password")
+        else:
+            messages.error(request,"Password Does not match")
+            return redirect('change_password')
+
+    return render(request,'accounts/change_password.html')
+
+@login_required(login_url='login')
+def order_details(request,order_id):
+    order_detail= OrderProduct.objects.filter(order__order_number= order_id)
+    orders = Order.objects.get(order_number = order_id)
+    subtotal = 0
+    for i in order_detail:
+        subtotal = i.product_price * i.quantity
+
+    context = {
+        'order_detail' : order_detail,
+        'order' : orders,
+        'subtotal': subtotal
+    }
+    return render(request,'accounts/order_detail.html',context)
+
+
 
 
 
