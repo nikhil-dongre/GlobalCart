@@ -1,7 +1,7 @@
 from django.shortcuts import redirect, render,get_object_or_404
 
 from orders.models import OrderProduct
-from .models import Product,ReviewRating
+from .models import Product,ReviewRating,ProductGallery
 from category.models import Category
 from carts.models import Cart,CartItem
 from carts.views import _card_id
@@ -50,12 +50,15 @@ def product_details(request,category_slug,product_slug):
     else:
         order_product = None
     reviews = ReviewRating.objects.filter(product_id = single_product.id,status=True)
+
+    product_gallery = ProductGallery.objects.filter(product_id = single_product.id)
     
     context ={
         'single_product': single_product,
         'in_cart': in_cart,
         'order_product': order_product,
-        'reviews': reviews
+        'reviews': reviews,
+        'product_gallery':product_gallery
 
     }
     
