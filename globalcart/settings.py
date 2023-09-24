@@ -27,7 +27,7 @@ SECRET_KEY = config('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = config('DEBUG', default=False, cast=bool)
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['django-globalcartnikhil-env.eba-fe58wdwb.us-west-2.elasticbeanstalk.com']
 
 
 # Application definition
@@ -55,12 +55,12 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'django_session_timeout.middleware.SessionTimeoutMiddleware',
+    # 'django_session_timeout.middleware.SessionTimeoutMiddleware',
 ]
 
-SESSION_EXPIRE_SECONDS = 60
-SESSION_EXPIRE_AFTER_LAST_ACTIVITY = True
-SESSION_TIMEOUT_REDIRECT = 'accounts/login'
+# SESSION_EXPIRE_SECONDS = 3600
+# SESSION_EXPIRE_AFTER_LAST_ACTIVITY = True
+# SESSION_TIMEOUT_REDIRECT = 'accounts/login'
 
 ROOT_URLCONF = 'globalcart.urls'
 
