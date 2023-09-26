@@ -30,7 +30,7 @@ SECRET_KEY = 'hy^n0fshic4i%jh9in50bv%s09&usbl6cz4wd*&g*p_9_mk4zm'
 # DEBUG = config('DEBUG', default=False, cast=bool)
 DEBUG = True
 
-ALLOWED_HOSTS = ['django-globalcartnikhil-env.eba-fe58wdwb.us-west-2.elasticbeanstalk.com']
+ALLOWED_HOSTS = ['django-globalcartnikhil-env.eba-fe58wdwb.us-west-2.elasticbeanstalk.com','localhost', '127.0.0.1']
 
 
 # Application definition
